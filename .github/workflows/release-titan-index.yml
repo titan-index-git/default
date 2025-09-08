@@ -1,22 +1,24 @@
-name: "Build & Release Titan Index (Sept 5, 2025)"
+name: "Build & Release Titan Index"
 
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: "Release tag (e.g., v-2025-09-05)"
+      build_ref:
+        description: "Branch or tag to build (e.g., download)"
         required: true
-        default: "v-2025-09-05"
+        default: "download"
+      tag:
+        description: "Release tag (e.g., v-2025-09-08-a)"
+        required: true
+        default: "v-${{ github.run_number }}"
       release_name:
         description: "Release name"
         required: true
-        default: "Titan Index - 2025-09-05"
+        default: "Titan Index - run ${{ github.run_number }}"
       zip_path:
-        description: "ZIP path to upload"
+        description: "ZIP filename to produce"
         required: true
-        default: "titan-index-sept5-final.zip"
-  push:
-    branches: ["download"]
+        default: "titan-index-${{ github.run_number }}.zip"
 
 permissions:
   contents: write
@@ -25,44 +27,56 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout repo"
+      - name: "Checkout selected ref"
         uses: actions/checkout@v4
         with:
-          lfs: true
+          ref: ${{ inputs.build_ref }}
+          fetch-depth: 0
 
       - name: "Debug - show branch and files"
         run: |
-          echo "Branch: $(git branch --show-current)"
+          set -euxo pipefail
+          echo "HEAD ref: ${{ inputs.build_ref }}"
+          git rev-parse --abbrev-ref HEAD || true
           pwd
           ls -lah
-          find . -maxdepth 2 -type f -name "*.zip" -print
+          echo "---- find . (3 levels) ----"
+          find . -maxdepth 3 -type f -print
 
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: "Install dependencies"
-        run: pip install beautifulsoup4
-
-      - name: "Build Titan Index ZIP"
-        run: python tools/refresh_titan_index.py
-
-      - name: "Verify ZIP exists"
+      - name: "Build ZIP (script if present, else static site)"
         run: |
-          test -f "${{ inputs.zip_path }}" || { echo "ERROR: ${{ inputs.zip_path }} not found"; ls -lah; exit 1; }
+          set -euxo pipefail
+          ZIP="${{ inputs.zip_path }}"
 
-      - name: "Create GitHub Release"
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ inputs.tag }}
-          name: ${{ inputs.release_name }}
-          body: |
-            Automated Titan Index update.
-          files: ${{ inputs.zip_path }}
+          if [ -f tools/refresh_titan_index.py ]; then
+            echo "Using tools/refresh_titan_index.py to build ${ZIP}"
+            python tools/refresh_titan_index.py "${ZIP}"
+          else
+            echo "No tools/refresh_titan_index.py found — packaging static site."
+            test -f index.html || { echo "::error::index.html not found at repo root on ref '${{ inputs.build_ref }}'"; exit 1; }
+            zip -r "${ZIP}" index.html assets data README.md 2>/dev/null || true
+            test -f "${ZIP}" || { echo "::error::Failed to create ${ZIP}"; exit 1; }
+          fi
+
+          echo "Built $(ls -lh "${ZIP}")"
 
       - name: "Attach ZIP to run (artifact)"
         uses: actions/upload-artifact@v4
         with:
           name: titan-index-zip
           path: ${{ inputs.zip_path }}
+
+      - name: "Create/Update GitHub Release"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          name: ${{ inputs.release_name }}
+          make_latest: true
+          overwrite: true
+          fail_on_unmatched_files: true
+          files: ${{ inputs.zip_path }}
