@@ -1,11 +1,28 @@
-name: Titan Index - Sanity
+name: Titan Index - Sanity (checkout)
 
 on:
   workflow_dispatch:
+    inputs:
+      build_ref:
+        description: "Branch or tag to check out"
+        required: true
+        default: "download"
 
 jobs:
   sanity:
     runs-on: ubuntu-latest
     steps:
-      - name: Say hello
-        run: echo "Workflow syntax OK. Ready for next step."
+      - name: Checkout selected ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.build_ref }}
+          fetch-depth: 0
+
+      - name: Show files
+        run: |
+          set -euxo pipefail
+          echo "HEAD ref: ${{ inputs.build_ref }}"
+          pwd
+          ls -lah
+          echo "---- find . (3 levels) ----"
+          find . -maxdepth 3 -type f -print
