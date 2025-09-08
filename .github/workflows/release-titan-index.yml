@@ -84,9 +84,24 @@ jobs:
         run: |
           set -euxo pipefail
           ZIP="${{ steps.vars.outputs.zip }}"
+
           if [ -f tools/refresh_titan_index.py ]; then
             echo "Using tools/refresh_titan_index.py to build ${ZIP}"
-            python tools/refresh_titan_index.py "${ZIP}"
+            # Run the script (it might ignore the filename)
+            python tools/refresh_titan_index.py "${ZIP}" || true
+
+            if [ ! -f "${ZIP}" ]; then
+              echo "Expected ${ZIP} not found — trying to locate the ZIP your script created…"
+              # Find newest .zip within repo (depth 3), then normalize the name
+              FOUND="$(find . -maxdepth 3 -type f -name '*.zip' -printf '%T@ %p\n' | sort -nr | awk 'NR==1{print $2}')"
+              if [ -n "${FOUND}" ]; then
+                echo "Found ZIP at ${FOUND}; normalizing to ${ZIP}"
+                cp "${FOUND}" "${ZIP}"
+              else
+                echo "::error::No ZIP produced by your script"
+                exit 1
+              fi
+            fi
           else
             echo "No tools/refresh_titan_index.py found — packaging static site."
             test -f index.html || { echo "::error::index.html not found at repo root on ref '${{ inputs.build_ref }}'"; exit 1; }
@@ -95,6 +110,7 @@ jobs:
             [ -d data ] && INCLUDE+=("data")
             zip -r "${ZIP}" "${INCLUDE[@]}"
           fi
+
           test -f "${ZIP}" || { echo "::error::Expected ZIP ${ZIP} not found"; exit 1; }
           echo "Built $(ls -lh "${ZIP}")"
 
