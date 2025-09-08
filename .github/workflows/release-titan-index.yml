@@ -47,19 +47,6 @@ jobs:
           echo "tag=$IN_TAG"   >> "$GITHUB_OUTPUT"
           echo "name=$IN_NAME" >> "$GITHUB_OUTPUT"
           echo "zip=$IN_ZIP"   >> "$GITHUB_OUTPUT"
-          echo "Using tag: $IN_TAG"
-          echo "Using name: $IN_NAME"
-          echo "Using zip:  $IN_ZIP"
-
-      - name: "Debug - show files"
-        shell: bash
-        run: |
-          set -euxo pipefail
-          echo "HEAD ref: ${{ inputs.build_ref }}"
-          pwd
-          ls -lah
-          echo "---- find . (3 levels) ----"
-          find . -maxdepth 3 -type f -print
 
       - name: "Set up Python"
         uses: actions/setup-python@v5
@@ -84,48 +71,15 @@ jobs:
         run: |
           set -euxo pipefail
           ZIP="${{ steps.vars.outputs.zip }}"
-
           if [ -f tools/refresh_titan_index.py ]; then
             echo "Using tools/refresh_titan_index.py to build ${ZIP}"
-            # Run the script (it might ignore the filename)
             python tools/refresh_titan_index.py "${ZIP}" || true
-
             if [ ! -f "${ZIP}" ]; then
-              echo "Expected ${ZIP} not found — trying to locate the ZIP your script created…"
-              # Find newest .zip within repo (depth 3), then normalize the name
+              echo "Expected ${ZIP} not found — locating produced ZIP…"
               FOUND="$(find . -maxdepth 3 -type f -name '*.zip' -printf '%T@ %p\n' | sort -nr | awk 'NR==1{print $2}')"
-              if [ -n "${FOUND}" ]; then
-                echo "Found ZIP at ${FOUND}; normalizing to ${ZIP}"
-                cp "${FOUND}" "${ZIP}"
-              else
-                echo "::error::No ZIP produced by your script"
-                exit 1
-              fi
+              [ -n "${FOUND}" ] || { echo "::error::No ZIP produced"; exit 1; }
+              cp "${FOUND}" "${ZIP}"
             fi
           else
             echo "No tools/refresh_titan_index.py found — packaging static site."
-            test -f index.html || { echo "::error::index.html not found at repo root on ref '${{ inputs.build_ref }}'"; exit 1; }
-            INCLUDE=(index.html README.md)
-            [ -d assets ] && INCLUDE+=("assets")
-            [ -d data ] && INCLUDE+=("data")
-            zip -r "${ZIP}" "${INCLUDE[@]}"
-          fi
-
-          test -f "${ZIP}" || { echo "::error::Expected ZIP ${ZIP} not found"; exit 1; }
-          echo "Built $(ls -lh "${ZIP}")"
-
-      - name: "Attach ZIP to run (artifact)"
-        uses: actions/upload-artifact@v4
-        with:
-          name: titan-index-zip
-          path: ${{ steps.vars.outputs.zip }}
-
-      - name: "Create/Update GitHub Release"
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.vars.outputs.tag }}
-          name: ${{ steps.vars.outputs.name }}
-          make_latest: true
-          overwrite: true
-          fail_on_unmatched_files: true
-          files: ${{ steps.vars.outputs.zip }}
+            test -f index.html || { echo "::error::index.html not found a
