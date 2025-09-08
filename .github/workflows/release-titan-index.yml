@@ -4,21 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       build_ref:
-        description: "Branch or tag to build (e.g., download)"
+        description: "Branch or tag to build"
         required: true
         default: "download"
       tag:
-        description: "Release tag (e.g., v-2025-09-08-a)"
-        required: true
-        default: "v-${{ github.run_number }}"
+        description: "Release tag (leave blank to auto-generate)"
+        required: false
+        default: ""
       release_name:
-        description: "Release name"
-        required: true
-        default: "Titan Index - run ${{ github.run_number }}"
+        description: "Release name (leave blank to auto-generate)"
+        required: false
+        default: ""
       zip_path:
-        description: "ZIP filename to produce"
-        required: true
-        default: "titan-index-${{ github.run_number }}.zip"
+        description: "ZIP filename (leave blank to auto-generate)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -33,11 +33,34 @@ jobs:
           ref: ${{ inputs.build_ref }}
           fetch-depth: 0
 
-      - name: "Debug - show branch and files"
+      - name: "Compute parameters"
+        id: vars
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Inputs (may be empty)
+          IN_TAG="${{ inputs.tag }}"
+          IN_NAME="${{ inputs.release_name }}"
+          IN_ZIP="${{ inputs.zip_path }}"
+
+          # Auto-fill when blank
+          if [ -z "$IN_TAG" ]; then IN_TAG="v-${GITHUB_RUN_NUMBER}"; fi
+          if [ -z "$IN_NAME" ]; then IN_NAME="Titan Index - run ${GITHUB_RUN_NUMBER}"; fi
+          if [ -z "$IN_ZIP" ]; then IN_ZIP="titan-index-${GITHUB_RUN_NUMBER}.zip"; fi
+
+          echo "tag=$IN_TAG"   >> "$GITHUB_OUTPUT"
+          echo "name=$IN_NAME" >> "$GITHUB_OUTPUT"
+          echo "zip=$IN_ZIP"   >> "$GITHUB_OUTPUT"
+
+          echo "Using tag: $IN_TAG"
+          echo "Using name: $IN_NAME"
+          echo "Using zip:  $IN_ZIP"
+
+      - name: "Debug - show files"
+        shell: bash
         run: |
           set -euxo pipefail
           echo "HEAD ref: ${{ inputs.build_ref }}"
-          git rev-parse --abbrev-ref HEAD || true
           pwd
           ls -lah
           echo "---- find . (3 levels) ----"
@@ -49,9 +72,10 @@ jobs:
           python-version: "3.11"
 
       - name: "Build ZIP (script if present, else static site)"
+        shell: bash
         run: |
           set -euxo pipefail
-          ZIP="${{ inputs.zip_path }}"
+          ZIP="${{ steps.vars.outputs.zip }}"
 
           if [ -f tools/refresh_titan_index.py ]; then
             echo "Using tools/refresh_titan_index.py to build ${ZIP}"
@@ -59,6 +83,7 @@ jobs:
           else
             echo "No tools/refresh_titan_index.py found — packaging static site."
             test -f index.html || { echo "::error::index.html not found at repo root on ref '${{ inputs.build_ref }}'"; exit 1; }
+            # Zip typical site files; ignore CI folders if missing
             zip -r "${ZIP}" index.html assets data README.md 2>/dev/null || true
             test -f "${ZIP}" || { echo "::error::Failed to create ${ZIP}"; exit 1; }
           fi
@@ -69,14 +94,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: titan-index-zip
-          path: ${{ inputs.zip_path }}
+          path: ${{ steps.vars.outputs.zip }}
 
       - name: "Create/Update GitHub Release"
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.tag }}
-          name: ${{ inputs.release_name }}
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: ${{ steps.vars.outputs.name }}
           make_latest: true
           overwrite: true
           fail_on_unmatched_files: true
-          files: ${{ inputs.zip_path }}
+          files: ${{ steps.vars.outputs.zip }}
+
