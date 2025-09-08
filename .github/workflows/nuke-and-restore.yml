@@ -1,0 +1,55 @@
+name: Nuke and Restore from ZIP
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch to restore into"
+        required: true
+        default: "download"
+      zip_filename:
+        description: "ZIP file name at repo root on the target branch"
+        required: true
+        default: "titan-index-with-whos-better-emojis.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Verify ZIP exists
+        run: |
+          set -euxo pipefail
+          ls -lah
+          test -f "${{ inputs.zip_filename }}" || { echo "ZIP not found at repo root"; exit 1; }
+
+      - name: Delete everything except .git, .github, and the ZIP
+        run: |
+          set -euxo pipefail
+          find . -mindepth 1 -maxdepth 1 \
+            -not -name ".git" \
+            -not -name ".github" \
+            -not -name "${{ inputs.zip_filename }}" \
+            -exec rm -rf {} +
+
+      - name: Unzip ZIP into repo root
+        run: |
+          set -euxo pipefail
+          unzip -o "${{ inputs.zip_filename }}" -d .
+
+      - name: Commit and push
+        run: |
+          set -euxo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Restore site from ${{ inputs.zip_filename }}" || echo "No changes to commit"
+          git push origin HEAD:${{ inputs.target_branch }}
