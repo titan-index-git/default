@@ -1,13 +1,29 @@
-name: Build & Release Titan Index (sanity)
+name: Build & Release Titan Index (checkout)
 
 on:
   workflow_dispatch:
+    inputs:
+      build_ref:
+        description: "Branch or tag to check out"
+        required: true
+        default: "download"
 
 jobs:
-  sanity:
+  checkout_and_list:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout selected ref
         uses: actions/checkout@v4
-      - name: Say hello
-        run: echo "release workflow syntax OK"
+        with:
+          ref: ${{ inputs.build_ref }}
+          fetch-depth: 0
+
+      - name: Show files
+        run: |
+          set -euxo pipefail
+          echo "HEAD ref: ${{ inputs.build_ref }}"
+          git rev-parse --short HEAD || true
+          echo "Files (depth 4):"
+          find . -maxdepth 4 -type f -print | sort
+          echo "Search for index.html:"
+          find . -maxdepth 10 -type f -iname 'index.html' -print || true
