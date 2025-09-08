@@ -9,10 +9,19 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # needed for releases
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          lfs: true              # <— pull LFS files too (if your ZIP uses LFS)
+
+      - name: Debug: show branch & files
+        run: |
+          echo "Branch: $(git branch --show-current)"
+          pwd
+          ls -lah
+          find . -maxdepth 2 -type f -name "*.zip" -print
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,8 +32,7 @@ jobs:
         run: pip install beautifulsoup4
 
       - name: Build Titan Index ZIP
-        run: |
-          python tools/refresh_titan_index.py
+        run: python tools/refresh_titan_index.py
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
