@@ -3,122 +3,213 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Titan Index - September 2025</title>
-  <meta name="description" content="Titan Index - objective monthly macro snapshot">
+  <title>The Titan Index: Real Data Dashboard (Feb–Aug 2025)</title>
+  <meta name="description" content="The Titan Index — real data dashboard with multi-month trends.">
   <style>
+    :root{
+      --bg:#f6f7fb; --ink:#0f172a; --muted:#64748b; --panel:#0f172a; --panel-ink:#e5e7eb;
+      --card:#ffffff; --line:#e5e7eb; --thead:#111827; --thead-ink:#e5e7eb;
+      --good:#16a34a; --bad:#dc2626; --warn:#d97706; --note:#0ea5e9;
+      --shadow:0 10px 30px rgba(2,6,23,.10);
+    }
     *{box-sizing:border-box}
-    body{margin:0;padding:0;background:#0b1020;color:#e5e7eb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    .wrap{max-width:1100px;margin:0 auto;padding:16px}
-    .header h1{margin:0 0 8px 0;font-weight:800;letter-spacing:.5px}
-    .meta{opacity:.8;font-size:14px}
-    .controls{display:flex;gap:8px;align-items:center;padding:8px 0;position:sticky;top:0;background:rgba(11,16,32,.9);z-index:10}
-    .btn{background:#0f172a;color:#e5e7eb;border:1px solid #1f2937;padding:8px 10px;border-radius:10px;cursor:pointer}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:12px}
-    .card{background:#111827;border:1px solid #1f2937;border-radius:16px;padding:14px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
-    .card h3{margin:0 0 6px 0;font-size:16px;font-weight:700}
-    .kpi{display:flex;align-items:baseline;gap:10px;margin:6px 0}
-    .value{font-size:28px;font-weight:800}
-    .trend{font-size:14px;opacity:.9}
-    .up{color:#16a34a}.down{color:#dc2626}.flat{color:#d97706}
-    .badge{display:inline-flex;gap:6px;align-items:center;font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #334155;background:#0b1225;color:#cbd5e1}
-    .footer{opacity:.8;font-size:12px}
-    .list{margin-top:8px;font-size:12px;color:#cbd5e1}
-    .list li{margin:4px 0}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1200px;margin:0 auto;padding:24px}
+    h1{font-size:28px;margin:0 0 18px 0}
+    /* HERO PANEL */
+    .hero{background:var(--panel); color:var(--panel-ink); border-radius:20px; box-shadow:var(--shadow); padding:22px; margin:18px 0 28px 0}
+    .hero h2{margin:0 0 14px 0; font-size:20px}
+    .hero-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .hero-card{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px}
+    .hero-card h3{margin:0 0 8px 0; font-size:16px}
+    .hero ul{margin:0; padding-left:18px}
+    .hero li{margin:6px 0}
+    .hero .split{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px}
+    .pill{display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08)}
+    /* SECTION TITLES */
+    .section-title{display:flex; align-items:center; gap:8px; font-weight:700; margin:28px 0 10px 0}
+    .section-title .emoji{font-size:20px}
+    /* TABLE */
+    .card{background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); overflow:hidden}
+    table{width:100%; border-collapse:separate; border-spacing:0}
+    thead th{background:var(--thead); color:var(--thead-ink); font-weight:700; font-size:13px; padding:10px 10px; text-align:left; border-bottom:1px solid #0b1220}
+    thead th:first-child{border-top-left-radius:14px}
+    thead th:last-child{border-top-right-radius:14px}
+    tbody td{border-bottom:1px solid var(--line); padding:9px 10px; font-size:14px; vertical-align:middle; background:#fff}
+    tbody tr:last-child td{border-bottom:none}
+    .label{font-weight:600}
+    .delta{font-weight:700}
+    .cell{display:flex; align-items:center; gap:8px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.good{background:var(--good)} .dot.bad{background:var(--bad)} .dot.flat{background:var(--warn)}
+    .muted{color:var(--muted)}
+    .overall{white-space:nowrap}
+    .foot{margin-top:8px; font-size:12px; color:var(--muted)}
+    /* UTIL */
+    .mt-8{margin-top:8px} .mb-0{margin-bottom:0}
   </style>
 </head>
 <body>
-  <header class="wrap header">
-    <h1>Titan Index</h1>
-    <p>Objective monthly macro snapshot across key indicators.</p>
-    <div class="meta"><span id="asOf"></span> - <span id="monthChange"></span></div>
-  </header>
+  <div class="wrap">
+    <h1>🧭 The Titan Index: Real Data Dashboard (Feb–Aug 2025)</h1>
 
-  <main class="wrap">
-    <section class="controls">
-      <button id="dlBtn" class="btn" title="Download current month JSON">Export September JSON</button>
+    <!-- HERO -->
+    <section class="hero">
+      <h2 class="mb-0">What this means for you (Feb → Aug 2025)</h2>
+      <div class="hero-grid">
+        <div class="hero-card">
+          <h3>✅ Top 3 Highlights</h3>
+          <ul>
+            <li><strong>Wages are edging up:</strong> Avg household income trending higher.</li>
+            <li><strong>Jobs hold steady:</strong> Unemployment ranged ~3.7–4.1%.</li>
+            <li><strong>Markets resilient:</strong> Major indices broadly supportive for 401(k)s.</li>
+          </ul>
+        </div>
+        <div class="hero-card">
+          <h3>⚠️ Top 3 Lowlights</h3>
+          <ul>
+            <li><strong>Housing pain:</strong> 30-yr mortgage ~6.6–7.1%, price-to-income > 6×.</li>
+            <li><strong>Essentials cost more:</strong> Everyday prices feel sticky.</li>
+            <li><strong>Mood cautious:</strong> Consumer confidence eases into the fall.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="split">
+        <div class="hero-card">
+          <h3>📄 Who’s Better vs. Worse?</h3>
+          <ul>
+            <li><span class="pill">Better off</span> Upper-income households (investments, property).</li>
+            <li><span class="pill">Squeezed</span> Middle class (rents and housing vs pay).</li>
+            <li><span class="pill">Worse off</span> Lower-income (inflation/rent eat gains).</li>
+          </ul>
+        </div>
+        <div class="hero-card">
+          <h3>ℹ️ September context</h3>
+          <ul>
+            <li>UR <strong>4.3%</strong> (Aug data); wages <strong>+3.7% YoY</strong>.</li>
+            <li>30-yr mortgage ~<strong>6.50%</strong> (week of Sep 4).</li>
+            <li>Median existing home price about <strong>$422,400</strong> (Jul).</li>
+          </ul>
+        </div>
+      </div>
     </section>
-    <section id="sections" class="grid"></section>
-  </main>
 
-  <footer class="wrap footer">
-    <p>Last updated <span id="buildDate"></span>.</p>
-  </footer>
+    <!-- HOUSING -->
+    <div class="section-title"><span class="emoji">🏠</span> Housing</div>
+    <div class="card">
+      <table id="tbl-housing"></table>
+    </div>
+    <div class="foot">Green dot = improved vs previous month (based on “what’s good” for that metric).</div>
+
+    <!-- PRICES -->
+    <div class="section-title mt-8"><span class="emoji">🧾</span> Consumer Prices</div>
+    <div class="card">
+      <table id="tbl-prices"></table>
+    </div>
+
+    <!-- LABOR -->
+    <div class="section-title mt-8"><span class="emoji">💼</span> Labor Market</div>
+    <div class="card">
+      <table id="tbl-labor"></table>
+    </div>
+
+    <p class="foot">Last updated <span id="asof"></span>.</p>
+  </div>
 
   <script>
-    (function(){
-      // Embedded September dataset (no /data folder needed)
-      var data = {
-        meta: {
-          label: "September 2025",
-          mom_note: "Labor market softened (UR 4.3%); wage growth 3.7% YoY; mortgage rates ~6.50%; median existing-home price about $422,400."
-        },
-        sections: [
-          { title: "Debt & Income", items: [
-              { name:"Inflation (YoY CPI)", display:"2.7%", change:"0.0 pp", direction:"flat", good_when_up:false,
-                notes:["Data period: Jul 2025. Next CPI (Aug) releases Sep 11, 2025."] },
-              { name:"Unemployment", display:"4.3%", change:"+0.1 pp", direction:"up", good_when_up:false,
-                notes:["Data period: Aug 2025."] },
-              { name:"Average Hourly Earnings", display:"+3.7% YoY", change:"-0.2 pp", direction:"down", good_when_up:true,
-                notes:["Data period: Aug 2025."] }
-            ]},
-          { title: "Housing", items: [
-              { name:"30y Mortgage Rate", display:"6.50%", change:"-0.06 pp", direction:"down", good_when_up:false,
-                notes:["Freddie Mac PMMS, week ending Sep 4, 2025."] },
-              { name:"Median Existing-Home Price", display:"$422,400", change:"-$12,900", direction:"down", good_when_up:false,
-                notes:["Jul 2025 vs Jun 2025 ($435,300)."] }
-            ]},
-          { title: "Markets", items: [
-              { name:"S&P 500 (level)", display:"~648", change:"-", direction:"flat", good_when_up:true,
-                notes:["Approx SPY level as of Sep 8, 2025."] },
-              { name:"BTC/USD (level)", display:"~$112,000", change:"-", direction:"flat", good_when_up:true,
-                notes:["As of Sep 8, 2025."] }
-            ]}
+    // ---------- CONFIG & DATA (edit here) ----------
+    const months = ["Feb 1","Mar 1","Apr 1","May 1","Jun 1","Jul 1","Aug 1"];
+
+    // Matches your screenshot values closely (you can overwrite later)
+    const SECTIONS = [
+      {
+        id: "tbl-housing",
+        rows: [
+          { name: "30-Year Mortgage Rate (%)", unit: "pct", goodUp: false, values: [6.63,6.94,6.82,7.06,6.86,6.84,6.90] },
+          { name: "Avg Home Price ($)", unit: "usd", goodUp: false, values: [479500,480900,482100,483200,484000,485500,486700] },
+          { name: "Home Price-to-Income Ratio", unit: "plain", goodUp: false, values: [6.55,6.53,6.52,6.50,6.47,6.44,6.43] }
         ]
-      };
-
-      // Header meta
-      document.getElementById("buildDate").textContent = new Date(document.lastModified).toLocaleString();
-      document.getElementById("asOf").textContent = "As of " + data.meta.label;
-      document.getElementById("monthChange").textContent = data.meta.mom_note;
-
-      // Helpers
-      function trendClass(d){ return d==="up"?"up":(d==="down"?"down":"flat"); }
-      function trendGlyph(d){ return d==="up"?"^":(d==="down"?"v":"="); }
-
-      // Render
-      var sectionsEl = document.getElementById("sections");
-      function render(){
-        sectionsEl.innerHTML = "";
-        data.sections.forEach(function(sec){
-          var card = document.createElement("article");
-          card.className = "card";
-          var h = document.createElement("h3");
-          h.textContent = sec.title;
-          card.appendChild(h);
-          sec.items.forEach(function(it){
-            var row = document.createElement("div"); row.className = "kpi";
-            var v = document.createElement("div"); v.className="value"; v.textContent = it.display;
-            var t = document.createElement("div"); t.className="trend " + trendClass(it.direction); t.textContent = trendGlyph(it.direction) + " " + it.change;
-            var b = document.createElement("span"); b.className="badge"; b.textContent = it.name;
-            row.appendChild(v); row.appendChild(t); row.appendChild(b); card.appendChild(row);
-            if(it.notes && it.notes.length){
-              var ul = document.createElement("ul"); ul.className="list";
-              it.notes.forEach(function(n){ var li=document.createElement("li"); li.textContent=n; ul.appendChild(li); });
-              card.appendChild(ul);
-            }
-          });
-          sectionsEl.appendChild(card);
-        });
+      },
+      {
+        id: "tbl-prices",
+        rows: [
+          { name: "Big Mac Price ($)", unit: "usd", goodUp: false, values: [5.99,6.09,6.19,6.29,6.29,6.39,6.39] },
+          { name: "CPI YoY (%)", unit: "pct", goodUp: false, values: [3.2,3.3,3.4,3.3,3.0,2.9,2.7] }
+        ]
+      },
+      {
+        id: "tbl-labor",
+        rows: [
+          { name: "Unemployment Rate (%)", unit: "pct", goodUp: false, values: [3.9,4.1,4.0,4.0,4.1,4.0,4.3] },
+          { name: "Average Hourly Earnings YoY (%)", unit: "pct", goodUp: true, values: [4.0,3.9,3.9,3.8,3.8,3.7,3.7] }
+        ]
       }
-      render();
+    ];
 
-      // Download JSON
-      document.getElementById("dlBtn").onclick = function(){
-        var blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
-        var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="2025-09.json"; a.click();
-        URL.revokeObjectURL(a.href);
-      };
-    })();
+    // ---------- RENDERING ----------
+    function fmt(v, unit){
+      if (v === null || v === undefined) return "—";
+      if (unit === "usd") return v.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
+      if (unit === "pct") return v.toFixed(2).replace(/\.00$/,"") + "%";
+      return String(v);
+    }
+    function delta(a,b,unit){
+      if (a===null||b===null||a===undefined||b===undefined) return "—";
+      const d = a - b;
+      const s = d===0 ? "0" : (d>0? "+"+d.toFixed(unit==="usd"?0:2) : d.toFixed(unit==="usd"?0:2));
+      return unit==="usd" ? (s.startsWith("+")? "+" : "") + s.replace(/\.\d+$/,"").replace("-", "-$") : s.replace(/\.00$/,"");
+    }
+    function dotClass(curr, prev, goodUp){
+      if (prev==null) return "flat";
+      if (curr===prev) return "flat";
+      const up = curr>prev;
+      return (goodUp ? (up?"good":"bad") : (up?"bad":"good"));
+    }
+    function buildTable(elId, rows){
+      const el = document.getElementById(elId);
+      const thead = document.createElement("thead");
+      const trh = document.createElement("tr");
+      ["Indicator", ...months, "Overall (vs Feb 1)"].forEach(h=>{
+        const th = document.createElement("th"); th.textContent=h; trh.appendChild(th);
+      });
+      thead.appendChild(trh);
+
+      const tb = document.createElement("tbody");
+      rows.forEach(r=>{
+        const tr = document.createElement("tr");
+        const td0 = document.createElement("td"); td0.innerHTML = `<span class="label">${r.name}</span>`;
+        tr.appendChild(td0);
+
+        r.values.forEach((v,i)=>{
+          const td = document.createElement("td");
+          const prev = i>0 ? r.values[i-1] : null;
+          const cls = dotClass(v, prev, r.goodUp);
+          td.innerHTML = `<div class="cell"><span class="dot ${cls}"></span><span>${fmt(v, r.unit)}</span></div>`;
+          tr.appendChild(td);
+        });
+
+        const ov = r.values[r.values.length-1];
+        const base = r.values[0];
+        const d = ov - base;
+        let text;
+        if (r.unit==="usd") text = (d>=0?"+":"") + (Math.round(d)).toLocaleString();
+        else if (r.unit==="pct") text = (d>=0?"+":"") + d.toFixed(2).replace(/\.00$/,"");
+        else text = (d>=0?"+":"") + d.toFixed(2).replace(/\.00$/,"");
+        const tdO = document.createElement("td"); tdO.className="overall";
+        tdO.innerHTML = `<span class="delta ${d>0?(r.goodUp?"good":"bad"):d<0?(r.goodUp?"bad":"good"):""}">${text}</span>`;
+        tr.appendChild(tdO);
+
+        tb.appendChild(tr);
+      });
+
+      el.innerHTML = "";
+      el.appendChild(thead);
+      el.appendChild(tb);
+    }
+
+    // Init
+    document.getElementById("asof").textContent = new Date().toLocaleString();
+    SECTIONS.forEach(sec=>buildTable(sec.id, sec.rows));
   </script>
 </body>
 </html>
