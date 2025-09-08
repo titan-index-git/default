@@ -1,85 +1,12 @@
-name: "Build & Release Titan Index"
+name: Build & Release Titan Index (sanity)
 
 on:
   workflow_dispatch:
-    inputs:
-      build_ref:
-        description: "Branch or tag to build"
-        required: true
-        default: "download"
-      tag:
-        description: "Release tag (leave blank to auto-generate)"
-        required: false
-        default: ""
-      release_name:
-        description: "Release name (leave blank to auto-generate)"
-        required: false
-        default: ""
-      zip_path:
-        description: "ZIP filename (leave blank to auto-generate)"
-        required: false
-        default: ""
-
-permissions:
-  contents: write
 
 jobs:
-  build-and-release:
+  sanity:
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout selected ref"
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.build_ref }}
-          fetch-depth: 0
-
-      - name: "Compute parameters"
-        id: vars
-        shell: bash
+      - name: Say hello
         run: |
-          set -euo pipefail
-          IN_TAG="${{ inputs.tag }}"
-          IN_NAME="${{ inputs.release_name }}"
-          IN_ZIP="${{ inputs.zip_path }}"
-          if [ -z "$IN_TAG" ]; then IN_TAG="v-${GITHUB_RUN_NUMBER}"; fi
-          if [ -z "$IN_NAME" ]; then IN_NAME="Titan Index - run ${GITHUB_RUN_NUMBER}"; fi
-          if [ -z "$IN_ZIP" ]; then IN_ZIP="titan-index-${GITHUB_RUN_NUMBER}.zip"; fi
-          echo "tag=$IN_TAG"   >> "$GITHUB_OUTPUT"
-          echo "name=$IN_NAME" >> "$GITHUB_OUTPUT"
-          echo "zip=$IN_ZIP"   >> "$GITHUB_OUTPUT"
-
-      - name: "Set up Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: "Install dependencies"
-        shell: bash
-        run: |
-          set -euxo pipefail
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            python -m pip install -r requirements.txt
-          elif [ -f tools/requirements.txt ]; then
-            python -m pip install -r tools/requirements.txt
-          else
-            python -m pip install beautifulsoup4 requests lxml
-          fi
-
-      - name: "Build ZIP (script if present, else static site)"
-        shell: bash
-        run: |
-          set -euxo pipefail
-          ZIP="${{ steps.vars.outputs.zip }}"
-          if [ -f tools/refresh_titan_index.py ]; then
-            echo "Using tools/refresh_titan_index.py to build ${ZIP}"
-            python tools/refresh_titan_index.py "${ZIP}" || true
-            if [ ! -f "${ZIP}" ]; then
-              echo "Expected ${ZIP} not found — locating produced ZIP…"
-              FOUND="$(find . -maxdepth 3 -type f -name '*.zip' -printf '%T@ %p\n' | sort -nr | awk 'NR==1{print $2}')"
-              [ -n "${FOUND}" ] || { echo "::error::No ZIP produced"; exit 1; }
-              cp "${FOUND}" "${ZIP}"
-            fi
-          else
-            echo "No tools/refresh_titan_index.py found — packaging static site."
-            test -f index.html || { echo "::error::index.html not found a
+          echo "Workflow syntax OK. Ready for next step."
