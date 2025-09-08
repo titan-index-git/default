@@ -1,4 +1,4 @@
-name: "Titan Index — Repo Doctor & Publisher"
+name: "Titan Index — Repo Doctor (ASCII-safe)"
 
 on:
   workflow_dispatch:
@@ -7,18 +7,6 @@ on:
         description: "Branch to patch and publish"
         required: true
         default: "download"
-      make_release:
-        description: "Also create/overwrite a GitHub Release with the ZIP? (true/false)"
-        required: true
-        default: "true"
-      release_tag:
-        description: "Release tag (blank = auto)"
-        required: false
-        default: ""
-      release_name:
-        description: "Release name (blank = auto)"
-        required: false
-        default: ""
 
 permissions:
   contents: write
@@ -27,13 +15,13 @@ jobs:
   doctor:
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout"
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 0
 
-      - name: "Write site files (embedded September)"
+      - name: Write index.html (embedded September)
         shell: bash
         run: |
           set -euo pipefail
@@ -41,173 +29,135 @@ jobs:
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Titan Index — September 2025</title>
-  <meta name="description" content="Titan Index — objective, monthly macro trends"/>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='60' text-anchor='middle' font-size='60'>🛡️</text></svg>">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <meta name="description" content="Titan Index — objective, monthly macro trends">
   <style>
-    :root{--ok:#16a34a; --bad:#dc2626; --warn:#d97706; --muted:#6b7280; --card:#111827; --bg:#0b1020; --ink:#e5e7eb}
+    :root{--ok:#16a34a;--bad:#dc2626;--warn:#d97706;--muted:#6b7280;--card:#111827;--bg:#0b1020;--ink:#e5e7eb}
     *{box-sizing:border-box}
-    html,body{margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    .wrap{max-width:1100px; margin:0 auto; padding:16px}
-    .header h1{margin:0 0 8px 0; font-weight:800; letter-spacing:.5px}
-    .header .meta{opacity:.8; font-size:14px}
-    .controls{display:flex; gap:8px; align-items:center; padding:8px 0; position:sticky; top:0; background:linear-gradient(180deg, rgba(11,16,32,.95), rgba(11,16,32,.75)); backdrop-filter: blur(6px); z-index:10}
-    .controls select,.controls button{background:#0f172a; color:var(--ink); border:1px solid #1f2937; padding:8px 10px; border-radius:10px}
-    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:12px}
-    .card{background:var(--card); border:1px solid #1f2937; border-radius:16px; padding:14px; box-shadow:0 10px 40px rgba(0,0,0,.25)}
-    .card h3{margin:0 0 6px 0; font-size:16px; font-weight:700}
-    .kpi{display:flex; align-items:baseline; gap:10px; margin:4px 0}
-    .kpi .value{font-size:28px; font-weight:800}
-    .kpi .trend{font-size:14px; opacity:.9}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .header h1{margin:0 0 8px 0;font-weight:800;letter-spacing:.5px}
+    .header .meta{opacity:.8;font-size:14px}
+    .controls{display:flex;gap:8px;align-items:center;padding:8px 0;position:sticky;top:0;background:rgba(11,16,32,.9);backdrop-filter:blur(6px);z-index:10}
+    .btn{background:#0f172a;color:var(--ink);border:1px solid #1f2937;padding:8px 10px;border-radius:10px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:12px}
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:14px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+    .card h3{margin:0 0 6px 0;font-size:16px;font-weight:700}
+    .kpi{display:flex;align-items:baseline;gap:10px;margin:4px 0}
+    .kpi .value{font-size:28px;font-weight:800}
+    .kpi .trend{font-size:14px;opacity:.9}
     .kpi .trend.up{color:var(--ok)} .kpi .trend.down{color:var(--bad)} .kpi .trend.flat{color:var(--warn)}
-    .badge{display:inline-flex; gap:6px; align-items:center; font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid #334155; background:#0b1225; color:#cbd5e1}
-    .footer{opacity:.8; font-size:12px}
+    .badge{display:inline-flex;gap:6px;align-items:center;font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #334155;background:#0b1225;color:#cbd5e1}
+    .footer{opacity:.8;font-size:12px}
     small.muted{color:var(--muted)}
-    .list{margin-top:8px; font-size:12px; color:#cbd5e1}
+    .list{margin-top:8px;font-size:12px;color:#cbd5e1}
     .list li{margin:4px 0}
   </style>
 </head>
 <body>
   <header class="wrap header">
-    <h1>🛡️ Titan Index</h1>
-    <p id="mission">In the time of press and cultural polarization, an attempt at an objective measuring stick combining all key health indicators for everyone.</p>
-    <div class="meta">
-      <span id="asOf"></span>
-      <span>•</span>
-      <span id="monthChange"></span>
-    </div>
+    <h1>Titan Index</h1>
+    <p id="mission">Objective monthly macro snapshot across key indicators.</p>
+    <div class="meta"><span id="asOf"></span> • <span id="monthChange"></span></div>
   </header>
 
   <main class="wrap">
     <section class="controls">
-      <label><small class="muted">Month:</small> September 2025</label>
-      <button id="dlBtn" title="Download current month JSON">Export month JSON</button>
+      <button id="dlBtn" class="btn" title="Download current month JSON">Export September JSON</button>
     </section>
     <section id="sections" class="grid"></section>
   </main>
 
   <footer class="wrap footer">
-    <p>Built for <strong>Mike Szymecki</strong>. Last updated <span id="buildDate"></span>.</p>
+    <p>Last updated <span id="buildDate"></span>.</p>
   </footer>
 
   <script>
-    const buildDateEl = document.getElementById('buildDate');
-    buildDateEl.textContent = new Date(document.lastModified).toLocaleString();
-
-    const data = {
-      "meta": {
-        "label": "September 2025",
-        "mom_note": "Labor market softened (UR 4.3%); wage growth cooled to 3.7% YoY; mortgage rates ~6.50%; median home price ~$422,400."
-      },
-      "sections": [
-        {
-          "title": "Debt & Income",
-          "emoji": "💵",
-          "items": [
-            {"name":"Inflation (YoY CPI)","display":"2.7%","change":"0.0 pp","direction":"flat","good_when_up":false,
-             "notes":["Data period: Jul 2025 (Aug CPI posts Sep 11)."]},
-            {"name":"Unemployment","display":"4.3%","change":"+0.1 pp","direction":"up","good_when_up":false,
-             "notes":["Data period: Aug 2025."]},
-            {"name":"Average Hourly Earnings","display":"+3.7% YoY","change":"-0.2 pp","direction":"down","good_when_up":true,
-             "notes":["Data period: Aug 2025."]}
-          ]
+    (function(){
+      var data = {
+        meta: {
+          label: "September 2025",
+          mom_note: "Labor market softened (UR 4.3%); wage growth 3.7% YoY; mortgage rates ~6.50%; median home price ~$422,400."
         },
-        {
-          "title": "Housing",
-          "emoji": "🏠",
-          "items": [
-            {"name":"30y Mortgage Rate","display":"6.50%","change":"-0.06 pp","direction":"down","good_when_up":false,
-             "notes":["Week ending Sep 4, 2025."]},
-            {"name":"Median Existing-Home Price","display":"$422,400","change":"0","direction":"flat","good_when_up":false,
-             "notes":["Data period: Jul 2025; ~flat MoM."]}
-          ]
-        },
-        {
-          "title": "Markets",
-          "emoji": "📈",
-          "items": [
-            {"name":"S&P 500 (SPY)","display":"~648","change":"—","direction":"flat","good_when_up":true,
-             "notes":["Level as of Sep 8, 2025."]},
-            {"name":"BTC/USD","display":"~$112k","change":"—","direction":"flat","good_when_up":true,
-             "notes":["Level as of Sep 8, 2025."]}
-          ]
-        }
-      ]
-    };
+        sections: [
+          { title: "Debt & Income", items: [
+              { name:"Inflation (YoY CPI)", display:"2.7%", change:"0.0 pp", direction:"flat", good_when_up:false,
+                notes:["Data period: Jul 2025 (Aug CPI posts Sep 11)."] },
+              { name:"Unemployment", display:"4.3%", change:"+0.1 pp", direction:"up", good_when_up:false,
+                notes:["Data period: Aug 2025."] },
+              { name:"Average Hourly Earnings", display:"+3.7% YoY", change:"-0.2 pp", direction:"down", good_when_up:true,
+                notes:["Data period: Aug 2025."] }
+            ]},
+          { title: "Housing", items: [
+              { name:"30y Mortgage Rate", display:"6.50%", change:"-0.06 pp", direction:"down", good_when_up:false,
+                notes:["Week ending Sep 4, 2025."] },
+              { name:"Median Existing-Home Price", display:"$422,400", change:"0", direction:"flat", good_when_up:false,
+                notes:["Data period: Jul 2025; approx flat MoM."] }
+            ]},
+          { title: "Markets", items: [
+              { name:"S&P 500 (SPY)", display:"648", change:"—", direction:"flat", good_when_up:true,
+                notes:["Level as of Sep 8, 2025."] },
+              { name:"BTC/USD", display:"$112000", change:"—", direction:"flat", good_when_up:true,
+                notes:["Level as of Sep 8, 2025."] }
+            ]}
+        ]
+      };
 
-    const sectionsEl = document.getElementById('sections');
-    const asOfEl = document.getElementById('asOf');
-    const monthChangeEl = document.getElementById('monthChange');
-    asOfEl.textContent = `As of ${data.meta.label}`;
-    monthChangeEl.textContent = data.meta.mom_note;
+      var buildDateEl = document.getElementById("buildDate");
+      buildDateEl.textContent = new Date(document.lastModified).toLocaleString();
+      var asOfEl = document.getElementById("asOf");
+      var monthChangeEl = document.getElementById("monthChange");
+      asOfEl.textContent = "As of " + data.meta.label;
+      monthChangeEl.textContent = data.meta.mom_note;
 
-    const trendClass = d => d==='up'?'up':(d==='down'?'down':'flat');
-    const trendGlyph = d => d==='up'?'▲':(d==='down'?'▼':'■');
+      function trendClass(d){ return d==="up"?"up":(d==="down"?"down":"flat"); }
+      function trendGlyph(d){ return d==="up"?"^":(d==="down"?"v":"■"); }
 
-    function render(){
-      sectionsEl.innerHTML = '';
-      data.sections.forEach(sec=>{
-        const card=document.createElement('article'); card.className='card';
-        const h=document.createElement('h3'); h.textContent=`${sec.emoji} ${sec.title}`; card.appendChild(h);
-        sec.items.forEach(it=>{
-          const row=document.createElement('div'); row.className='kpi';
-          const v=document.createElement('div'); v.className='value'; v.textContent=it.display;
-          const t=document.createElement('div'); t.className=`trend ${trendClass(it.direction)}`; t.textContent=`${trendGlyph(it.direction)} ${it.change}`;
-          const b=document.createElement('span'); b.className='badge'; b.innerText=it.name;
-          row.appendChild(v); row.appendChild(t); row.appendChild(b); card.appendChild(row);
-          if(it.notes?.length){ const ul=document.createElement('ul'); ul.className='list'; it.notes.forEach(n=>{ const li=document.createElement('li'); li.textContent=n; ul.appendChild(li); }); card.appendChild(ul); }
+      var sectionsEl = document.getElementById("sections");
+      function render(){
+        sectionsEl.innerHTML = "";
+        data.sections.forEach(function(sec){
+          var card = document.createElement("article");
+          card.className = "card";
+          var h = document.createElement("h3");
+          h.textContent = sec.title;
+          card.appendChild(h);
+          sec.items.forEach(function(it){
+            var row = document.createElement("div"); row.className = "kpi";
+            var v = document.createElement("div"); v.className="value"; v.textContent = it.display;
+            var t = document.createElement("div"); t.className="trend " + trendClass(it.direction); t.textContent = trendGlyph(it.direction) + " " + it.change;
+            var b = document.createElement("span"); b.className="badge"; b.textContent = it.name;
+            row.appendChild(v); row.appendChild(t); row.appendChild(b); card.appendChild(row);
+            if(it.notes && it.notes.length){
+              var ul = document.createElement("ul"); ul.className="list";
+              it.notes.forEach(function(n){ var li=document.createElement("li"); li.textContent=n; ul.appendChild(li); });
+              card.appendChild(ul);
+            }
+          });
+          sectionsEl.appendChild(card);
         });
-        sectionsEl.appendChild(card);
-      });
-    }
-    render();
+      }
+      render();
 
-    document.getElementById('dlBtn').onclick = ()=>{
-      const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='2025-09.json'; a.click();
-      URL.revokeObjectURL(a.href);
-    };
+      document.getElementById("dlBtn").onclick = function(){
+        var blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+        var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="2025-09.json"; a.click();
+        URL.revokeObjectURL(a.href);
+      };
+    })();
   </script>
 </body>
 </html>
 HTML
 
-      - name: "Commit site to target branch"
+      - name: Commit and push
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Repo Doctor: reset index.html with embedded September data" || echo "No changes to commit"
+          git commit -m "Repo Doctor: replace index.html with embedded September data" || echo "No changes to commit"
           git push origin HEAD:${{ inputs.target_branch }}
-
-      - name: "Package site ZIP"
-        shell: bash
-        run: |
-          set -euxo pipefail
-          ZIP="titan-index-${GITHUB_RUN_NUMBER}.zip"
-          echo "ZIP=${ZIP}" >> $GITHUB_ENV
-          zip -r "${ZIP}" index.html README.md 2>/dev/null || true
-          echo "Built $(ls -lh "${ZIP}")"
-
-      - name: "Attach ZIP to run (artifact)"
-        uses: actions/upload-artifact@v4
-        with:
-          name: titan-index-zip
-          path: ${{ env.ZIP }}
-
-      - name: "Maybe create/update GitHub Release"
-        if: ${{ inputs.make_release == 'true' }}
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ inputs.release_tag != '' && inputs.release_tag || format('v-{0}', github.run_number) }}
-          name: ${{ inputs.release_name != '' && inputs.release_name || format('Titan Index - run {0}', github.run_number) }}
-          make_latest: true
-          overwrite: true
-          fail_on_unmatched_files: true
-          files: ${{ env.ZIP }}
