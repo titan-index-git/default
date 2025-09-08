@@ -38,20 +38,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Inputs (may be empty)
           IN_TAG="${{ inputs.tag }}"
           IN_NAME="${{ inputs.release_name }}"
           IN_ZIP="${{ inputs.zip_path }}"
-
-          # Auto-fill when blank
           if [ -z "$IN_TAG" ]; then IN_TAG="v-${GITHUB_RUN_NUMBER}"; fi
           if [ -z "$IN_NAME" ]; then IN_NAME="Titan Index - run ${GITHUB_RUN_NUMBER}"; fi
           if [ -z "$IN_ZIP" ]; then IN_ZIP="titan-index-${GITHUB_RUN_NUMBER}.zip"; fi
-
           echo "tag=$IN_TAG"   >> "$GITHUB_OUTPUT"
           echo "name=$IN_NAME" >> "$GITHUB_OUTPUT"
           echo "zip=$IN_ZIP"   >> "$GITHUB_OUTPUT"
-
           echo "Using tag: $IN_TAG"
           echo "Using name: $IN_NAME"
           echo "Using zip:  $IN_ZIP"
@@ -71,23 +66,36 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: "Install dependencies"
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt
+          elif [ -f tools/requirements.txt ]; then
+            python -m pip install -r tools/requirements.txt
+          else
+            python -m pip install beautifulsoup4 requests lxml
+          fi
+
       - name: "Build ZIP (script if present, else static site)"
         shell: bash
         run: |
           set -euxo pipefail
           ZIP="${{ steps.vars.outputs.zip }}"
-
           if [ -f tools/refresh_titan_index.py ]; then
             echo "Using tools/refresh_titan_index.py to build ${ZIP}"
             python tools/refresh_titan_index.py "${ZIP}"
           else
             echo "No tools/refresh_titan_index.py found — packaging static site."
             test -f index.html || { echo "::error::index.html not found at repo root on ref '${{ inputs.build_ref }}'"; exit 1; }
-            # Zip typical site files; ignore CI folders if missing
-            zip -r "${ZIP}" index.html assets data README.md 2>/dev/null || true
-            test -f "${ZIP}" || { echo "::error::Failed to create ${ZIP}"; exit 1; }
+            INCLUDE=(index.html README.md)
+            [ -d assets ] && INCLUDE+=("assets")
+            [ -d data ] && INCLUDE+=("data")
+            zip -r "${ZIP}" "${INCLUDE[@]}"
           fi
-
+          test -f "${ZIP}" || { echo "::error::Expected ZIP ${ZIP} not found"; exit 1; }
           echo "Built $(ls -lh "${ZIP}")"
 
       - name: "Attach ZIP to run (artifact)"
@@ -105,4 +113,3 @@ jobs:
           overwrite: true
           fail_on_unmatched_files: true
           files: ${{ steps.vars.outputs.zip }}
-
