@@ -1,0 +1,11 @@
+name: Titan Index - Sanity
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say hello
+        run: echo "Workflow syntax OK. Ready for next step."
