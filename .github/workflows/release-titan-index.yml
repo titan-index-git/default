@@ -1,4 +1,4 @@
-name: Build & Release Titan Index (Sept 5, 2025)
+name: "Build & Release Titan Index (Sept 5, 2025)"
 
 on:
   workflow_dispatch:
@@ -6,17 +6,17 @@ on:
       tag:
         description: "Release tag (e.g., v-2025-09-05)"
         required: true
-        default: v-2025-09-05
+        default: "v-2025-09-05"
       release_name:
         description: "Release name"
         required: true
-        default: "Titan Index — 2025-09-05"
+        default: "Titan Index - 2025-09-05"
       zip_path:
         description: "ZIP path to upload"
         required: true
-        default: titan-index-sept5-final.zip
+        default: "titan-index-sept5-final.zip"
   push:
-    branches: [download]
+    branches: ["download"]
 
 permissions:
   contents: write
@@ -25,30 +25,30 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: "Checkout repo"
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Debug: show branch & files
+      - name: "Debug - show branch and files"
         run: |
           echo "Branch: $(git branch --show-current)"
           pwd
           ls -lah
           find . -maxdepth 2 -type f -name "*.zip" -print
 
-      - name: Set up Python
+      - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install dependencies
+      - name: "Install dependencies"
         run: pip install beautifulsoup4
 
-      - name: Build Titan Index ZIP
+      - name: "Build Titan Index ZIP"
         run: python tools/refresh_titan_index.py
 
-      - name: Create GitHub Release
+      - name: "Create GitHub Release"
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag }}
