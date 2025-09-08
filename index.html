@@ -1,3 +1,124 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Titan Index - placeholder</title></head>
-<body><h1>Titan Index</h1><p>Placeholder OK on branch: download</p></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Titan Index - September 2025</title>
+  <meta name="description" content="Titan Index - objective monthly macro snapshot">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;padding:0;background:#0b1020;color:#e5e7eb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .header h1{margin:0 0 8px 0;font-weight:800;letter-spacing:.5px}
+    .meta{opacity:.8;font-size:14px}
+    .controls{display:flex;gap:8px;align-items:center;padding:8px 0;position:sticky;top:0;background:rgba(11,16,32,.9);z-index:10}
+    .btn{background:#0f172a;color:#e5e7eb;border:1px solid #1f2937;padding:8px 10px;border-radius:10px;cursor:pointer}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:12px}
+    .card{background:#111827;border:1px solid #1f2937;border-radius:16px;padding:14px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+    .card h3{margin:0 0 6px 0;font-size:16px;font-weight:700}
+    .kpi{display:flex;align-items:baseline;gap:10px;margin:6px 0}
+    .value{font-size:28px;font-weight:800}
+    .trend{font-size:14px;opacity:.9}
+    .up{color:#16a34a}.down{color:#dc2626}.flat{color:#d97706}
+    .badge{display:inline-flex;gap:6px;align-items:center;font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #334155;background:#0b1225;color:#cbd5e1}
+    .footer{opacity:.8;font-size:12px}
+    .list{margin-top:8px;font-size:12px;color:#cbd5e1}
+    .list li{margin:4px 0}
+  </style>
+</head>
+<body>
+  <header class="wrap header">
+    <h1>Titan Index</h1>
+    <p>Objective monthly macro snapshot across key indicators.</p>
+    <div class="meta"><span id="asOf"></span> - <span id="monthChange"></span></div>
+  </header>
+
+  <main class="wrap">
+    <section class="controls">
+      <button id="dlBtn" class="btn" title="Download current month JSON">Export September JSON</button>
+    </section>
+    <section id="sections" class="grid"></section>
+  </main>
+
+  <footer class="wrap footer">
+    <p>Last updated <span id="buildDate"></span>.</p>
+  </footer>
+
+  <script>
+    (function(){
+      // Embedded September dataset (no /data folder needed)
+      var data = {
+        meta: {
+          label: "September 2025",
+          mom_note: "Labor market softened (UR 4.3%); wage growth 3.7% YoY; mortgage rates ~6.50%; median existing-home price about $422,400."
+        },
+        sections: [
+          { title: "Debt & Income", items: [
+              { name:"Inflation (YoY CPI)", display:"2.7%", change:"0.0 pp", direction:"flat", good_when_up:false,
+                notes:["Data period: Jul 2025. Next CPI (Aug) releases Sep 11, 2025."] },
+              { name:"Unemployment", display:"4.3%", change:"+0.1 pp", direction:"up", good_when_up:false,
+                notes:["Data period: Aug 2025."] },
+              { name:"Average Hourly Earnings", display:"+3.7% YoY", change:"-0.2 pp", direction:"down", good_when_up:true,
+                notes:["Data period: Aug 2025."] }
+            ]},
+          { title: "Housing", items: [
+              { name:"30y Mortgage Rate", display:"6.50%", change:"-0.06 pp", direction:"down", good_when_up:false,
+                notes:["Freddie Mac PMMS, week ending Sep 4, 2025."] },
+              { name:"Median Existing-Home Price", display:"$422,400", change:"-$12,900", direction:"down", good_when_up:false,
+                notes:["Jul 2025 vs Jun 2025 ($435,300)."] }
+            ]},
+          { title: "Markets", items: [
+              { name:"S&P 500 (level)", display:"~648", change:"-", direction:"flat", good_when_up:true,
+                notes:["Approx SPY level as of Sep 8, 2025."] },
+              { name:"BTC/USD (level)", display:"~$112,000", change:"-", direction:"flat", good_when_up:true,
+                notes:["As of Sep 8, 2025."] }
+            ]}
+        ]
+      };
+
+      // Header meta
+      document.getElementById("buildDate").textContent = new Date(document.lastModified).toLocaleString();
+      document.getElementById("asOf").textContent = "As of " + data.meta.label;
+      document.getElementById("monthChange").textContent = data.meta.mom_note;
+
+      // Helpers
+      function trendClass(d){ return d==="up"?"up":(d==="down"?"down":"flat"); }
+      function trendGlyph(d){ return d==="up"?"^":(d==="down"?"v":"="); }
+
+      // Render
+      var sectionsEl = document.getElementById("sections");
+      function render(){
+        sectionsEl.innerHTML = "";
+        data.sections.forEach(function(sec){
+          var card = document.createElement("article");
+          card.className = "card";
+          var h = document.createElement("h3");
+          h.textContent = sec.title;
+          card.appendChild(h);
+          sec.items.forEach(function(it){
+            var row = document.createElement("div"); row.className = "kpi";
+            var v = document.createElement("div"); v.className="value"; v.textContent = it.display;
+            var t = document.createElement("div"); t.className="trend " + trendClass(it.direction); t.textContent = trendGlyph(it.direction) + " " + it.change;
+            var b = document.createElement("span"); b.className="badge"; b.textContent = it.name;
+            row.appendChild(v); row.appendChild(t); row.appendChild(b); card.appendChild(row);
+            if(it.notes && it.notes.length){
+              var ul = document.createElement("ul"); ul.className="list";
+              it.notes.forEach(function(n){ var li=document.createElement("li"); li.textContent=n; ul.appendChild(li); });
+              card.appendChild(ul);
+            }
+          });
+          sectionsEl.appendChild(card);
+        });
+      }
+      render();
+
+      // Download JSON
+      document.getElementById("dlBtn").onclick = function(){
+        var blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+        var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="2025-09.json"; a.click();
+        URL.revokeObjectURL(a.href);
+      };
+    })();
+  </script>
+</body>
+</html>
