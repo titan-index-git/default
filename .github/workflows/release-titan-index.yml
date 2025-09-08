@@ -48,6 +48,10 @@ jobs:
       - name: "Build Titan Index ZIP"
         run: python tools/refresh_titan_index.py
 
+      - name: "Verify ZIP exists"
+        run: |
+          test -f "${{ inputs.zip_path }}" || { echo "ERROR: ${{ inputs.zip_path }} not found"; ls -lah; exit 1; }
+
       - name: "Create GitHub Release"
         uses: softprops/action-gh-release@v2
         with:
@@ -56,3 +60,9 @@ jobs:
           body: |
             Automated Titan Index update.
           files: ${{ inputs.zip_path }}
+
+      - name: "Attach ZIP to run (artifact)"
+        uses: actions/upload-artifact@v4
+        with:
+          name: titan-index-zip
+          path: ${{ inputs.zip_path }}
