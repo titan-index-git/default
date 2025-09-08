@@ -1,88 +1,179 @@
-
-<!DOCTYPE html>
-
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 40px;
-      background: #f8f9fa;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    h2 {
-      margin-top: 40px;
-      font-size: 20px;
-      color: #2f3640;
-      border-bottom: 2px solid #ccc;
-      padding-bottom: 5px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      table-layout: fixed;
-      font-size: 14px;
-      margin-bottom: 40px;
-    }
-    th, td {
-      padding: 8px;
-      text-align: center;
-      border: 1px solid #ccc;
-    }
-    th {
-      background-color: #343a40;
-      color: #fff;
-    }
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-    td:first-child, th:first-child {
-      width: 16%;
-      text-align: left;
-      font-weight: bold;
-    }
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Titan Index — September 2025</title>
+  <meta name="description" content="Titan Index — objective, monthly macro trends"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='60' text-anchor='middle' font-size='60'>🛡️</text></svg>">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--ok:#16a34a; --bad:#dc2626; --warn:#d97706; --muted:#6b7280; --card:#111827; --bg:#0b1020; --ink:#e5e7eb}
+    *{box-sizing:border-box}
+    html,body{margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1100px; margin:0 auto; padding:16px}
+    .header h1{margin:0 0 8px 0; font-weight:800; letter-spacing:.5px}
+    .header .meta{opacity:.8; font-size:14px}
+    .controls{display:flex; gap:8px; align-items:center; padding:8px 0; position:sticky; top:0; background:linear-gradient(180deg, rgba(11,16,32,.95), rgba(11,16,32,.75)); backdrop-filter: blur(6px); z-index:10}
+    .controls select,.controls button{background:#0f172a; color:var(--ink); border:1px solid #1f2937; padding:8px 10px; border-radius:10px}
+    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:12px}
+    .card{background:var(--card); border:1px solid #1f2937; border-radius:16px; padding:14px; box-shadow:0 10px 40px rgba(0,0,0,.25)}
+    .card h3{margin:0 0 6px 0; font-size:16px; font-weight:700}
+    .kpi{display:flex; align-items:baseline; gap:10px; margin:4px 0}
+    .kpi .value{font-size:28px; font-weight:800}
+    .kpi .trend{font-size:14px; opacity:.9}
+    .kpi .trend.up{color:var(--ok)} .kpi .trend.down{color:var(--bad)} .kpi .trend.flat{color:var(--warn)}
+    .badge{display:inline-flex; gap:6px; align-items:center; font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid #334155; background:#0b1225; color:#cbd5e1}
+    .footer{opacity:.8; font-size:12px}
+    small.muted{color:var(--muted)}
+    .list{margin-top:8px; font-size:12px; color:#cbd5e1}
+    .list li{margin:4px 0}
   </style>
 </head>
 <body>
-<h1>🧭 The Titan Index: Real Data Dashboard (Feb–Aug 2025)</h1>
-<section id="summary-card" style="max-width:1200px;margin:0 auto 20px auto;">
-<div style="background:#0f172a;color:#e2e8f0;border-radius:14px;padding:18px 20px;box-shadow:0 10px 24px rgba(2,6,23,0.35);">
-<h2 style="margin:0 0 8px 0;font-size:20px;display:flex;align-items:center;gap:8px; color:#ffffff;">
-<span>🧠</span>
-<span>What this means for you (Feb → Aug 2025)</span>
-</h2>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-<div>
-<h3 style="margin:8px 0;font-size:16px;color:#86efac;display:flex;align-items:center;gap:6px;">✅ Top 3 Highlights</h3>
-<ul style="margin:8px 0 0 18px;line-height:1.5;">
-<li><strong>Wages are edging up:</strong> Avg Household Income climbs from ~$73.2k → ~$75.5k.</li>
-<li><strong>Jobs hold steady:</strong> Unemployment ~3.7–4.1%, ending at 3.7%.</li>
-<li><strong>Markets resilient:</strong> S&amp;P 500 &amp; NASDAQ trend higher overall, supporting 401(k)s.</li>
-</ul>
-</div>
-<div>
-<h3 style="margin:8px 0;font-size:16px;color:#fca5a5;display:flex;align-items:center;gap:6px;">⚠️ Top 3 Lowlights</h3>
-<ul style="margin:8px 0 0 18px;line-height:1.5;">
-<li><strong>Housing pain:</strong> 30-yr mortgage ~6.6%→6.9% and price-to-income stays &gt;6×.</li>
-<li><strong>Essentials cost more:</strong> Gas and eggs rise; everyday prices feel sticky.</li>
-<li><strong>Mood is cautious:</strong> Consumer Confidence eases; presidential approval dips.</li>
-</ul>
-</div>
-</div>
-<div style="margin-top:20px;padding-top:12px;border-top:1px solid #334155;">
-<h3 style="margin:8px 0;font-size:16px;color:#fbbf24;display:flex;align-items:center;gap:6px;">
-        🧾 Who’s Better vs. Worse?
-      </h3>
-<ul style="margin:8px 0 0 18px;line-height:1.5;">
-<li>💎 <strong>Better off:</strong> Upper class — shielded by wealth, investments, and property ownership.</li>
-<li>🏠 <strong>Squeezed:</strong> Middle class — wages rising, but housing and essentials outpace gains.</li>
-<li>💸 <strong>Worse off:</strong> Lower class — hardest hit, as inflation and rents eat away modest income gains.</li>
-</ul>
-</div>
-</div>
-</section>
-<h2>🏠 Housing</h2><table><thead><tr><th>Indicator</th><th>Feb 1</th><th>Mar 1</th><th>Apr 1</th><th>May 1</th><th>Jun 1</th><th>Jul 1</th><th>Aug 1</th><th>Overall (vs Feb 1)</th></tr></thead><tbody><tr><td><a href="charts/30-year-mortgage-rate-.html">30-Year Mortgage Rate (%)</a></td><td>6.63</td><td>🟥 6.94</td><td>🟢 6.82</td><td>🟥 7.06</td><td>🟢 6.86</td><td>🟢 6.84</td><td>🟥 6.9</td><td>🟥 +0.27</td></tr><tr><td><a href="charts/avg-home-price-.html">Avg Home Price ($)</a></td><td>479500</td><td>🟥 480900</td><td>🟥 482100</td><td>🟥 483200</td><td>🟥 484000</td><td>🟥 485500</td><td>🟥 486700</td><td>🟥 +7200</td></tr><tr><td><a href="charts/home-price-to-income-ratio.html">Home Price-to-Income Ratio</a></td><td>6.55</td><td>🟢 6.53</td><td>🟢 6.52</td><td>🟢 6.5</td><td>🟢 6.47</td><td>🟢 6.44</td><td>🟢 6.43</td><td>🟢 -0.12</td></tr></tbody></table><h2>🛒 Consumer Prices</h2><table><thead><tr><th>Indicator</th><th>Feb 1</th><th>Mar 1</th><th>Apr 1</th><th>May 1</th><th>Jun 1</th><th>Jul 1</th><th>Aug 1</th><th>Overall (vs Feb 1)</th></tr></thead><tbody><tr><td><a href="charts/big-mac-price-.html">Big Mac Price ($)</a></td><td>5.99</td><td>🟥 6.09</td><td>🟥 6.19</td><td>🟥 6.29</td><td>➖ 6.29</td><td>🟥 6.39</td><td>➖ 6.39</td><td>🟥 +0.4</td></tr><tr><td><a href="charts/gas-price-avg--gal.html">Gas Price (avg, $/gal)</a></td><td>3.28</td><td>🟥 3.34</td><td>🟥 3.59</td><td>🟥 3.71</td><td>🟢 3.45</td><td>🟥 3.54</td><td>🟥 3.9</td><td>🟥 +0.62</td></tr><tr><td><a href="charts/milk-avg--gal.html">Milk (avg, $/gal)</a></td><td>3.89</td><td>🟥 3.92</td><td>🟥 3.94</td><td>🟥 3.95</td><td>🟥 3.96</td><td>🟥 3.97</td><td>🟥 4.0</td><td>🟥 +0.11</td></tr><tr><td><a href="charts/eggs-avg--dozen.html">Eggs (avg, $/dozen)</a></td><td>2.52</td><td>🟥 2.99</td><td>🟥 3.09</td><td>🟥 3.19</td><td>🟢 3.14</td><td>🟥 3.23</td><td>🟥 3.28</td><td>🟥 +0.76</td></tr><tr><td><a href="charts/new-car-price-avg-.html">New Car Price (avg, $)</a></td><td>48400</td><td>🟢 48250</td><td>🟢 48100</td><td>🟢 47950</td><td>🟢 47800</td><td>🟢 47650</td><td>🟢 47500</td><td>🟢 -900</td></tr></tbody></table><h2>💳 Debt &amp; Income</h2><table><thead><tr><th>Indicator</th><th>Feb 1</th><th>Mar 1</th><th>Apr 1</th><th>May 1</th><th>Jun 1</th><th>Jul 1</th><th>Aug 1</th><th>Overall (vs Feb 1)</th></tr></thead><tbody><tr><td><a href="charts/avg-household-income-.html">Avg Household Income ($)</a></td><td>73160</td><td>🟢 73500</td><td>🟢 73700</td><td>🟢 74000</td><td>🟢 74500</td><td>🟢 74900</td><td>🟢 75500</td><td>🟢 +2340</td></tr><tr><td><a href="charts/avg-tax-rate-.html">Avg Tax Rate (%)</a></td><td>13.5</td><td>🟥 13.6</td><td>➖ 13.6</td><td>🟥 13.7</td><td>🟥 13.8</td><td>➖ 13.8</td><td>🟥 13.9</td><td>🟥 +0.4</td></tr><tr><td><a href="charts/credit-card-debt-avg-.html">Credit Card Debt (avg, $)</a></td><td>10290</td><td>🟥 10360</td><td>🟥 10430</td><td>🟥 10510</td><td>🟥 10570</td><td>🟥 10620</td><td>🟥 10680</td><td>🟥 +390</td></tr><tr><td><a href="charts/inflation-rate-.html">Inflation Rate (%)</a></td><td>3.1</td><td>🟥 3.2</td><td>🟥 3.4</td><td>🟢 3.3</td><td>🟢 3.0</td><td>🟥 3.1</td><td>🟥 3.2</td><td>🟥 +0.1</td></tr></tbody></table><h2>📈 Market Performance</h2><table><thead><tr><th>Indicator</th><th>Feb 1</th><th>Mar 1</th><th>Apr 1</th><th>May 1</th><th>Jun 1</th><th>Jul 1</th><th>Aug 1</th><th>Overall (vs Feb 1)</th></tr></thead><tbody><tr><td><a href="charts/djia.html">DJIA</a></td><td>38500</td><td>🟢 39010</td><td>🟢 39750</td><td>🟢 40080</td><td>🟥 39320</td><td>🟢 39650</td><td>🟥 36200</td><td>🟥 -2300</td></tr><tr><td><a href="charts/nasdaq.html">NASDAQ</a></td><td>15500</td><td>🟢 15850</td><td>🟢 16230</td><td>🟢 16540</td><td>🟥 16090</td><td>🟢 16320</td><td>🟥 15800</td><td>🟢 +300</td></tr><tr><td><a href="charts/s&amp;p-500.html">S&amp;P 500</a></td><td>4960</td><td>🟢 5025</td><td>🟢 5140</td><td>🟢 5280</td><td>🟥 5195</td><td>🟢 5275</td><td>🟥 5150</td><td>🟢 +190</td></tr></tbody></table><h2>📊 Other Macroeconomics</h2><table><thead><tr><th>Indicator</th><th>Feb 1</th><th>Mar 1</th><th>Apr 1</th><th>May 1</th><th>Jun 1</th><th>Jul 1</th><th>Aug 1</th><th>Overall (vs Feb 1)</th></tr></thead><tbody><tr><td><a href="charts/unemployment-rate-.html">Unemployment Rate (%)</a></td><td>3.7</td><td>🟥 3.9</td><td>➖ 3.9</td><td>🟥 4.0</td><td>🟥 4.1</td><td>🟢 3.8</td><td>🟢 3.7</td><td>➖ 0</td></tr><tr><td><a href="charts/consumer-confidence.html">Consumer Confidence</a></td><td>106.7</td><td>🟥 104.5</td><td>🟥 103.0</td><td>🟥 102.2</td><td>🟥 101.3</td><td>🟢 102.0</td><td>🟥 101.8</td><td>🟥 -4.9</td></tr><tr><td><a href="charts/presidential-approval-.html">Presidential Approval (%)</a></td><td>41.0</td><td>🟢 41.2</td><td>🟥 40.8</td><td>🟥 39.7</td><td>🟢 39.9</td><td>🟢 40.0</td><td>🟥 39.6</td><td>🟥 -1.4</td></tr></tbody></table></body></html>
+  <header class="wrap header">
+    <h1>🛡️ Titan Index</h1>
+    <p id="mission">In the time of press and cultural polarization, an attempt at an objective measuring stick combining all key health indicators for everyone.</p>
+    <div class="meta">
+      <span id="asOf"></span>
+      <span>•</span>
+      <span id="monthChange"></span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="controls" class="controls">
+      <label for="monthSelect">Month:</label>
+      <select id="monthSelect"></select>
+      <button id="dlBtn" title="Download current month JSON">Export month JSON</button>
+    </section>
+    <section id="sections" class="grid"></section>
+  </main>
+
+  <footer class="wrap footer">
+    <p>Built for <strong>Mike Szymecki</strong>. Last updated <span id="buildDate"></span>.</p>
+  </footer>
+
+  <!-- Embedded default data (Sept 2025). If /data/*.json exists, we load that instead. -->
+  <script>
+    window.TITAN_DATA = {
+      "months":[{"label":"2025-09","file":"__embedded__"}],
+      "embedded":{
+        "meta":{
+          "label":"September 2025",
+          "mom_note":"Labor market softened (UR 4.3%); wage growth cooled to 3.7% YoY; mortgage rates eased to ~6.50%; NAR median price steady at $422,400."
+        },
+        "sections":[
+          {
+            "title":"Debt & Income","emoji":"💵",
+            "items":[
+              {"name":"Inflation (YoY CPI)","display":"2.7%","change":"0.0 pp","direction":"flat","good_when_up":false,
+               "notes":["Data period: Jul 2025 (next CPI due Sep 11, 2025). Source: BLS CPI."]},
+              {"name":"Unemployment","display":"4.3%","change":"+0.1 pp","direction":"up","good_when_up":false,
+               "notes":["Data period: Aug 2025. Source: BLS Employment Situation."]},
+              {"name":"Average Hourly Earnings","display":"+3.7% YoY","change":"-0.2 pp","direction":"down","good_when_up":true,
+               "notes":["Data period: Aug 2025. Source: BLS Employment Situation."]}
+            ]
+          },
+          {
+            "title":"Housing","emoji":"🏠",
+            "items":[
+              {"name":"30y Mortgage Rate","display":"6.50%","change":"-0.06 pp","direction":"down","good_when_up":false,
+               "notes":["Week ending Sep 4, 2025. Source: Freddie Mac PMMS."]},
+              {"name":"Median Existing-Home Price","display":"$422,400","change":"0","direction":"flat","good_when_up":false,
+               "notes":["Data period: Jul 2025; +0.2% YoY. Source: NAR."]}
+            ]
+          },
+          {
+            "title":"Markets","emoji":"📈",
+            "items":[
+              {"name":"S&P 500 (SPY)","display":"648.44","change":"—","direction":"flat","good_when_up":true,
+               "notes":["Level as of Sep 8, 2025 close ~= intraday."]},
+              {"name":"BTC/USD","display":"$112,423","change":"—","direction":"flat","good_when_up":true,
+               "notes":["Level as of Sep 8, 2025."]}
+            ]
+          }
+        ]
+      }
+    };
+  </script>
+
+  <script>
+    const monthSelect = document.getElementById('monthSelect');
+    const sectionsEl = document.getElementById('sections');
+    const asOfEl = document.getElementById('asOf');
+    const monthChangeEl = document.getElementById('monthChange');
+    const buildDateEl = document.getElementById('buildDate');
+    const dlBtn = document.getElementById('dlBtn');
+    buildDateEl.textContent = new Date(document.lastModified).toLocaleString();
+
+    const trendClass = d => d==='up'?'up':(d==='down'?'down':'flat');
+    const trendGlyph = d => d==='up'?'▲':(d==='down'?'▼':'■');
+
+    async function tryFetch(url){
+      try{ const r = await fetch(url); if(!r.ok) throw 0; return await r.json(); }catch(_){ return null; }
+    }
+
+    function renderMonth(month){
+      asOfEl.textContent = `As of ${month.meta.label}`;
+      monthChangeEl.textContent = `${month.meta.mom_note||''}`.trim();
+      sectionsEl.innerHTML = '';
+      month.sections.forEach(sec=>{
+        const card = document.createElement('article'); card.className='card';
+        const h = document.createElement('h3'); h.textContent = `${sec.emoji} ${sec.title}`; card.appendChild(h);
+        sec.items.forEach(it=>{
+          const row = document.createElement('div'); row.className='kpi';
+          const v = document.createElement('div'); v.className='value'; v.textContent = it.display;
+          const t = document.createElement('div'); t.className=`trend ${trendClass(it.direction)}`; t.textContent = `${trendGlyph(it.direction)} ${it.change}`;
+          const b = document.createElement('span'); b.className='badge'; b.innerText = `${it.name}`;
+          row.appendChild(v); row.appendChild(t); row.appendChild(b); card.appendChild(row);
+          if(it.notes && it.notes.length){ const ul=document.createElement('ul'); ul.className='list'; it.notes.forEach(n=>{ const li=document.createElement('li'); li.innerHTML=n; ul.appendChild(li);}); card.appendChild(ul); }
+        });
+        sectionsEl.appendChild(card);
+      });
+    }
+
+    async function init(){
+      // Try external data first (if you later add /data/index.json). Otherwise use embedded.
+      let idx = await tryFetch('data/index.json');
+      let month;
+      if(idx && idx.months && idx.months.length){
+        // Load last month file
+        const last = idx.months[idx.months.length-1];
+        let m = (last.file==='__embedded__') ? window.TITAN_DATA.embedded : await tryFetch('data/'+last.file);
+        month = m || window.TITAN_DATA.embedded;
+        idx = idx; // keep
+      } else {
+        // Fully embedded mode
+        idx = { months: window.TITAN_DATA.months };
+        month = window.TITAN_DATA.embedded;
+      }
+
+      // Populate dropdown (embedded only shows Sept by default)
+      monthSelect.innerHTML = '';
+      idx.months.forEach((m,i)=>{
+        const opt = document.createElement('option');
+        opt.value = m.file; opt.textContent = m.label;
+        if(i===idx.months.length-1) opt.selected = true;
+        monthSelect.appendChild(opt);
+      });
+      renderMonth(month);
+
+      dlBtn.onclick = ()=>{
+        const blob = new Blob([JSON.stringify(month, null, 2)], {type:'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '2025-09.json'; a.click();
+        URL.revokeObjectURL(a.href);
+      };
+      monthSelect.addEventListener('change', async e=>{
+        if(e.target.value==='__embedded__'){ renderMonth(window.TITAN_DATA.embedded); }
+        else {
+          const m = await tryFetch('data/'+e.target.value);
+          if(m) renderMonth(m);
+        }
+      });
+    }
+    init();
+  </script>
+</body>
+</html>
