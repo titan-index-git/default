@@ -1,0 +1,45 @@
+name: Build & Release Titan Index (Sept 5, 2025)
+
+on:
+  workflow_dispatch:   # run manually
+  push:
+    branches: [ download ]   # run when pushing to 'download'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          lfs: true              # <— pull LFS files too (if your ZIP uses LFS)
+
+      - name: Debug: show branch & files
+        run: |
+          echo "Branch: $(git branch --show-current)"
+          pwd
+          ls -lah
+          find . -maxdepth 2 -type f -name "*.zip" -print
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install beautifulsoup4
+
+      - name: Build Titan Index ZIP
+        run: python tools/refresh_titan_index.py
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v-2025-09-05
+          name: Titan Index — 2025-09-05
+          body: |
+            Automated Titan Index update for Sept 5, 2025.
+            Includes refreshed tables, charts, and “Who’s Better vs Worse?”
+          files: titan-index-sept5-final.zip
